@@ -34,13 +34,13 @@ export const BallElement: React.FC<BallElementProps> = ({
         }}
       >
         <defs>
-          <radialGradient id="sphereShade" cx="35%" cy="30%" r="65%">
+          <radialGradient id={`sphereShade-${skin.id}`} cx="35%" cy="30%" r="65%">
             <stop offset="0%" stopColor="#ffffff" stopOpacity="0.8" />
             <stop offset="25%" stopColor={skin.primaryColor} stopOpacity="0.9" />
             <stop offset="85%" stopColor="#0f172a" stopOpacity="0.8" />
           </radialGradient>
 
-          <clipPath id="sphereClip">
+          <clipPath id={`sphereClip-${skin.id}`}>
             <circle cx="50" cy="50" r="46" />
           </clipPath>
         </defs>
@@ -49,7 +49,7 @@ export const BallElement: React.FC<BallElementProps> = ({
         <circle cx="50" cy="50" r="46" fill={skin.primaryColor} />
 
         {/* Stripes / Pattern Clipped to Sphere */}
-        <g clipPath="url(#sphereClip)">
+        <g clipPath={`url(#sphereClip-${skin.id})`}>
           {skin.pattern === 'striped' && (
             <>
               {/* Curved stripes matching the screenshot */}
@@ -98,7 +98,7 @@ export const BallElement: React.FC<BallElementProps> = ({
           )}
 
           {/* 3D Lighting and Shadow Overlay */}
-          <circle cx="50" cy="50" r="46" fill="url(#sphereShade)" />
+          <circle cx="50" cy="50" r="46" fill={`url(#sphereShade-${skin.id})`} />
         </g>
 
         {/* Specular Highlight */}

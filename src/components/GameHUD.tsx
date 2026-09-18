@@ -124,6 +124,16 @@ export const GameHUD: React.FC<GameHUDProps> = ({
           >
             <HelpCircle className="w-4 h-4" />
           </button>
+
+          {/* Restart Game */}
+          <button
+            id="btn-restart-hud"
+            onClick={onRestartGame}
+            title="Restart Show"
+            className="p-2 rounded-xl bg-black/40 hover:bg-black/60 text-rose-200 hover:text-white border border-red-900/50 backdrop-blur-sm active:scale-95 transition"
+          >
+            <RotateCcw className="w-4 h-4" />
+          </button>
         </div>
 
         {/* Right: Coins, Round Counter (1 / 8), and Circular Timer (Matching Screenshot) */}

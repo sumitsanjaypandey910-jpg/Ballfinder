@@ -59,6 +59,7 @@ export default function App() {
   const [timerProgress, setTimerProgress] = useState<number>(1);
   const timerRef = useRef<number | null>(null);
   const roundActiveRef = useRef<boolean>(false);
+  const activeRoundIdRef = useRef<number>(0);
 
   // Transition Duration in ms (scales slightly with rounds)
   const getTransitionDuration = useCallback(() => {
@@ -89,10 +90,13 @@ export default function App() {
   // Start a new Round
   const startRound = useCallback(
     async (roundNum: number, currentCupCount: number) => {
+      const roundId = ++activeRoundIdRef.current;
       roundActiveRef.current = true;
       setTimerProgress(1);
       setRevealedCupId(null);
       setActiveSwapInfo(null);
+
+      const isCurrent = () => roundActiveRef.current && activeRoundIdRef.current === roundId;
 
       // 1. Pick a random cup for the ball
       const chosenBallCupId = Math.floor(Math.random() * currentCupCount);
@@ -109,7 +113,7 @@ export default function App() {
 
       // 2. Reveal Phase: Lift the cup with the ball
       await new Promise((r) => setTimeout(r, 300));
-      if (!roundActiveRef.current) return;
+      if (!isCurrent()) return;
 
       setGamePhase('reveal');
       sound.playCupLift();
@@ -119,7 +123,7 @@ export default function App() {
 
       // Display ball to player for 1.2 seconds
       await new Promise((r) => setTimeout(r, 1200));
-      if (!roundActiveRef.current) return;
+      if (!isCurrent()) return;
 
       // 3. Cover Phase: Lower cup onto ball
       setGamePhase('cover');
@@ -127,7 +131,7 @@ export default function App() {
       setCups((prev) => prev.map((c) => ({ ...c, isLifted: false })));
 
       await new Promise((r) => setTimeout(r, 450));
-      if (!roundActiveRef.current) return;
+      if (!isCurrent()) return;
 
       // 4. Shuffling Phase: Perform sequential swaps
       setGamePhase('shuffling');
@@ -143,7 +147,7 @@ export default function App() {
       }));
 
       for (let s = 0; s < swapCount; s++) {
-        if (!roundActiveRef.current) return;
+        if (!isCurrent()) return;
 
         // Pick two distinct cups to swap
         const idxA = Math.floor(Math.random() * currentCupCount);
@@ -170,11 +174,13 @@ export default function App() {
         );
 
         await new Promise((r) => setTimeout(r, durationMs + 40));
+        if (!isCurrent()) return;
         setActiveSwapInfo(null);
         await new Promise((r) => setTimeout(r, 30));
+        if (!isCurrent()) return;
       }
 
-      if (!roundActiveRef.current) return;
+      if (!isCurrent()) return;
 
       // 5. Guessing Phase: Waiting for child to tap a cup
       setGamePhase('guessing');
@@ -188,7 +194,7 @@ export default function App() {
         const remain = Math.max(0, 1 - elapsed / totalTimeMs);
         setTimerProgress(remain);
 
-        if (remain > 0 && roundActiveRef.current) {
+        if (remain > 0 && isCurrent()) {
           timerRef.current = requestAnimationFrame(runTimer);
         }
       };
@@ -266,8 +272,12 @@ export default function App() {
 
   // Restart entire game
   const handleRestartGame = () => {
+    activeRoundIdRef.current++;
     roundActiveRef.current = false;
-    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    if (timerRef.current) {
+      cancelAnimationFrame(timerRef.current);
+      timerRef.current = null;
+    }
     setIsGameOverOpen(false);
     setCurrentRound(1);
     setScore(0);
@@ -278,8 +288,12 @@ export default function App() {
 
   // Switch difficulty
   const handleSelectDifficulty = (diff: DifficultyLevel) => {
+    activeRoundIdRef.current++;
     roundActiveRef.current = false;
-    if (timerRef.current) cancelAnimationFrame(timerRef.current);
+    if (timerRef.current) {
+      cancelAnimationFrame(timerRef.current);
+      timerRef.current = null;
+    }
     setDifficulty(diff);
     setCurrentRound(1);
     setScore(0);
