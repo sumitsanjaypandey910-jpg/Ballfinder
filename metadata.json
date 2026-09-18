@@ -1,0 +1,6 @@
+{
+  "name": "Track the Ball - Magic Cups",
+  "description": "A delightful magic cup shuffle memory game for children where players track the hidden ball across theater stage swaps with smooth animations and audio.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
